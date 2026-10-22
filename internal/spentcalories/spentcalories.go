@@ -11,7 +11,6 @@ import (
 
 // Основные константы, необходимые для расчетов.
 const (
-	//	lenStep                    = 0.65 // средняя длина шага. - что-то я не понял где это надо использовать и надо ли.
 	mInKm                      = 1000 // количество метров в километре.
 	minInH                     = 60   // количество минут в часе.
 	stepLengthCoefficient      = 0.45 // коэффициент для расчета длины шага на основе роста.
@@ -25,25 +24,25 @@ const (
 func parseTraining(data string) (int, string, time.Duration, error) {
 	parts := strings.Split(data, ",")
 	if len(parts) != 3 {
-		return 0, "", 0, errors.New("данные должны содержать три значения через запятую")
+		return 0, "", 0, errors.New("expected three comma-separated values")
 	}
 
 	steps, err := strconv.Atoi(parts[0])
 	if err != nil {
-		return 0, "", 0, err
+		return 0, "", 0, fmt.Errorf("parse steps: %w", err)
 	}
 
 	if steps <= 0 {
-		return 0, "", 0, errors.New("количество шагов должно быть больше нуля")
+		return 0, "", 0, errors.New("steps must be greater than zero")
 	}
 
 	duration, err := time.ParseDuration(parts[2])
 	if err != nil {
-		return 0, "", 0, err
+		return 0, "", 0, fmt.Errorf("parse duration: %w", err)
 	}
 
 	if duration <= 0 {
-		return 0, "", 0, errors.New("продолжительность тренировки должна быть больше нуля")
+		return 0, "", 0, errors.New("training duration must be greater than zero")
 	}
 
 	return steps, parts[1], duration, nil
@@ -78,6 +77,7 @@ func meanSpeed(steps int, height float64, duration time.Duration) float64 {
 func TrainingInfo(data string, weight, height float64) (string, error) {
 	steps, trainingType, duration, err := parseTraining(data)
 	if err != nil {
+		err = fmt.Errorf("parse training data: %w", err)
 		log.Println(err)
 		return "", err
 	}
@@ -94,6 +94,7 @@ func TrainingInfo(data string, weight, height float64) (string, error) {
 	}
 
 	if err != nil {
+		err = fmt.Errorf("calculate training calories: %w", err)
 		log.Println(err)
 		return "", err
 	}
@@ -122,19 +123,19 @@ func TrainingInfo(data string, weight, height float64) (string, error) {
 // Если любой из параметров меньше или равен нулю, возвращает 0 и ошибку.
 func RunningSpentCalories(steps int, weight, height float64, duration time.Duration) (float64, error) {
 	if steps <= 0 {
-		return 0, errors.New("количество шагов должно быть больше нуля")
+		return 0, errors.New("steps must be greater than zero")
 	}
 
 	if weight <= 0 {
-		return 0, errors.New("вес должен быть больше нуля")
+		return 0, errors.New("weight must be greater than zero")
 	}
 
 	if height <= 0 {
-		return 0, errors.New("рост должен быть больше нуля")
+		return 0, errors.New("height must be greater than zero")
 	}
 
 	if duration <= 0 {
-		return 0, errors.New("продолжительность бега должна быть больше нуля")
+		return 0, errors.New("running duration must be greater than zero")
 	}
 
 	speed := meanSpeed(steps, height, duration)
@@ -152,19 +153,19 @@ func RunningSpentCalories(steps int, weight, height float64, duration time.Durat
 // если любой из параметров меньше или равен нулю, возвращает 0 и ошибку.
 func WalkingSpentCalories(steps int, weight, height float64, duration time.Duration) (float64, error) {
 	if steps <= 0 {
-		return 0, errors.New("количество шагов должно быть больше нуля")
+		return 0, errors.New("steps must be greater than zero")
 	}
 
 	if weight <= 0 {
-		return 0, errors.New("вес должен быть больше нуля")
+		return 0, errors.New("weight must be greater than zero")
 	}
 
 	if height <= 0 {
-		return 0, errors.New("рост должен быть больше нуля")
+		return 0, errors.New("height must be greater than zero")
 	}
 
 	if duration <= 0 {
-		return 0, errors.New("продолжительность ходьбы должна быть больше нуля")
+		return 0, errors.New("walking duration must be greater than zero")
 	}
 
 	speed := meanSpeed(steps, height, duration)

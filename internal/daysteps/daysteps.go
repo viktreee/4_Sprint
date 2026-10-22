@@ -24,25 +24,25 @@ const (
 func parsePackage(data string) (int, time.Duration, error) {
 	parts := strings.Split(data, ",")
 	if len(parts) != 2 {
-		return 0, 0, errors.New("данные должны содержать два значения через запятую")
+		return 0, 0, errors.New("expected two comma-separated values")
 	}
 
 	steps, err := strconv.Atoi(parts[0])
 	if err != nil {
-		return 0, 0, err
+		return 0, 0, fmt.Errorf("parse steps: %w", err)
 	}
 
 	if steps <= 0 {
-		return 0, 0, errors.New("количество шагов должно быть больше нуля")
+		return 0, 0, errors.New("steps must be greater than zero")
 	}
 
 	duration, err := time.ParseDuration(parts[1])
 	if err != nil {
-		return 0, 0, err
+		return 0, 0, fmt.Errorf("parse duration: %w", err)
 	}
 
 	if duration <= 0 {
-		return 0, 0, errors.New("продолжительность прогулки должна быть больше нуля")
+		return 0, 0, errors.New("walk duration must be greater than zero")
 	}
 
 	return steps, duration, nil
